@@ -1,0 +1,17 @@
+
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Generated datasets
+data/raw/*.csv
+data/processed/*.csv
+
+# Trained models
+models/*.pkl
+models/*.joblib
+models/*.keras
+
+# IDE files
+.vscode/
