@@ -25,7 +25,8 @@ STOCKS = {
     "ITC": "ITC.NS",
     "LARSEN_TOUBRO": "LT.NS",
     "BHARTI_AIRTEL": "BHARTIARTL.NS",
-    "TATA_MOTORS": "TATAMOTORS.NS",
+        "TATA_MOTORS_PV": "TMPV.NS",
+    "TATA_MOTORS_CV": "TMCV.NS",
 }
 
 # Historical data settings
