@@ -47,7 +47,10 @@ def train_xgboost(target_column="Target_1D"):
     df, X, y, feature_columns = prepare_data(df)
 
     X_train, X_test, y_train, y_test = (
-        chronological_split(df, X, y)
+        chronological_split(
+            df, X, y,
+            horizon=int(target_column.split("_")[1].replace("D", "")),
+        )
     )
 
     # Convert target labels to integers

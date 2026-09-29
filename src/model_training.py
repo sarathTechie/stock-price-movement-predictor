@@ -113,18 +113,36 @@ def prepare_data(df):
 # 4. Chronological train-test split
 # --------------------------------------------------
 
-def chronological_split(df, X, y):
+def chronological_split(
+    df,
+    X,
+    y,
+    horizon=1,):
 
-    # Find the date separating the earliest 80%
-    # of trading dates from the latest 20%.
+    # Find the chronological cutoff
     unique_dates = sorted(df["Date"].unique())
 
     split_index = int(len(unique_dates) * (1 - TEST_SIZE))
-
     split_date = unique_dates[split_index]
 
+    # Initial chronological split
     train_mask = df["Date"] < split_date
     test_mask = df["Date"] >= split_date
+
+    # Purge the last training row(s) per ticker
+    # to prevent future-label overlap across the boundary.
+    horizon = 1
+
+    train_df = df.loc[train_mask].copy()
+
+    purge_indices = (
+        train_df
+        .groupby("Ticker", sort=False)
+        .tail(horizon)
+        .index
+    )
+
+    train_mask.loc[purge_indices] = False
 
     X_train = X.loc[train_mask]
     X_test = X.loc[test_mask]
@@ -133,12 +151,11 @@ def chronological_split(df, X, y):
     y_test = y.loc[test_mask]
 
     logging.info(f"Training cutoff: {split_date}")
-    logging.info(f"Training rows: {len(X_train)}")
+    logging.info(f"Training rows after purge: {len(X_train)}")
     logging.info(f"Testing rows: {len(X_test)}")
+    logging.info(f"Purged training rows: {len(purge_indices)}")
 
     return X_train, X_test, y_train, y_test
-
-
 # --------------------------------------------------
 # 5. Build Logistic Regression model
 # --------------------------------------------------

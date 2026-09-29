@@ -250,15 +250,20 @@ def add_technical_indicators(
             df["Daily_Return"].shift(lag)
         )
 
+   
     # --------------------------------------------------
-    # 11. TARGET LABELS
+    # 11. TARGET LABELS ALIGNED WITH TRADE EXECUTION
     # --------------------------------------------------
 
     for horizon in HORIZONS:
 
-        future_return = (
-            close.shift(-horizon) / close - 1
-        )
+        # Signal is generated after today's close.
+        # Entry is the next trading session's Open.
+        # Exit is Open after the selected holding horizon.
+        entry_price = df["Open"].shift(-1)
+        exit_price = df["Open"].shift(-(horizon + 1))
+
+        future_return = exit_price / entry_price - 1
 
         threshold = THRESHOLDS[horizon]
 

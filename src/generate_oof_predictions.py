@@ -68,8 +68,11 @@ def generate_predictions(target_column, purge_days):
         if fold == 3:
             test_end_index = len(dates)
 
+        # Entry is next session Open and exit is horizon sessions after entry.
+        # Purge horizon+1 date buckets to avoid labels reaching the test fold.
+        purge_gap = int(purge_days) + 1
         train_end_index = max(
-            0, test_start_index - purge_days
+            0, test_start_index - purge_gap
         )
 
         train_dates = dates[:train_end_index]
@@ -154,6 +157,9 @@ def generate_predictions(target_column, purge_days):
         all_predictions,
         ignore_index=True
     )
+    predictions_df = predictions_df.sort_values(
+        ["Date", "Ticker"]
+    ).drop_duplicates(["Date", "Ticker"], keep="last").reset_index(drop=True)
 
     output_file = (
         PREDICTION_DIR
